@@ -1,0 +1,54 @@
+/**
+ * Login服务器接口
+ *
+ * @author 
+ */
+ 
+module Style
+{ 
+    struct ReqLoginByWxCode
+    {
+        0 require string code; // Auth授权code
+    };
+
+    struct ReqLoginByQQToken
+    {
+        0 require string openid; // 开放平台openid
+        1 require string token; // Auth授权token
+    };
+
+    struct RspLogin
+    {
+        0 optional int ret_code;
+        1 optional string ret_msg;  
+        2 optional string uid;  // 业务唯一标识id
+        3 optional string ticket; // 业务登录态
+    };
+
+    struct ReqCheckTicket
+    {
+        0 optional string uid; 
+        1 optional string ticket;
+    };
+
+    interface Login
+    {  
+        /** 
+         * QQ互联登录
+         * @return 0 成功，其它失败
+         */
+        int LoginByQQToken(ReqLoginByQQToken req, out RspLogin rsp);
+
+        /** 
+         * 微信互联登录
+         * @return 0 成功，其它失败
+         */
+        int LoginByWxCode(ReqLoginByWxCode req, out RspLogin rsp); 
+ 
+        /** 
+         * 校验登录态(WNSProxy调用)
+         * @return 0 成功，其它失败
+         */
+        int CheckTicket(ReqCheckTicket req);
+    };
+};

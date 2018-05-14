@@ -1,0 +1,27 @@
+
+module LBS
+{
+	enum GPSTYPE
+	{
+		GPS_WGS84 = 0,		// WGS-84系统的坐标(一般手机硬件读到数值的是该系统)
+		GPS_GCJ02  = 1,		// 火星坐标(按保密局要求加扰后的坐标，
+		GPS_WGS_REAL = 2	// 确认输入为硬件读出来的GPS，而不是像iphone或android自己使用cell,wifi定位的数值
+	};
+
+	struct GPS
+	{
+		// 1.以下经度、纬度数值均为相应坐标*1,000,000，即去掉小数点(WUP的float精确度支持不够)
+		// 2.默认值为非法值,表示该无该字段属性
+		0 require int iLat = 900000000; // 纬度
+		1 require int iLon = 900000000; // 经度
+		2 require int iAlt = -10000000; // 海拨
+		3 optional GPSTYPE eType = GPS_WGS84; // 如果是从手机硬件读出来的，要设置此gps为GPS_WGS84
+							// 如果是使用LBS组提供的SDK组件获取的，此字段需要用QLBSGPSInfo::getType() 获取
+	};
+	
+	struct LBSInfo
+	{
+		//位置信息 GPS、cells、wifis至少有一个是需要的
+		0 optional GPS stGps;              // GPS经纬度(WGS坐标,手机默认的输入)
+	};
+};

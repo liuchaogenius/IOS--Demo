@@ -1,0 +1,61 @@
+/**
+ * SppDemo 接口文件
+ *
+ * @author 
+ */
+
+module MQQ
+{
+     // 监控/状态 报告的每个步骤信息
+    struct ReportItem
+    {
+          0 optional string step;       // 关键步骤
+                                      // 例如支付的步骤： payInvoke;parseUrl;payAuth;payAuthResult;callSDK;SDKcallback
+          1 optional long costTime;     // 每个步骤对应的耗时(单位ms).  例如： 658
+          2 optional string params;     // 记录关键步骤输入的相关参数，采用URL的格式。 如："apple_pay_source=1&app_id=3232"
+          3 optional int result;        // 结果,0:成功，-1:存储失败，-2：已存在
+          4 optional string failReason; // 失败原因，如：系统抛出的Exception信息
+    };
+
+    // 监控/状态 报告信息头
+    struct ReportHeader
+    {
+            0 optional string  platform;       // 客户端平台和平台版本和机型， platform 字段的格式： os|系统|机型
+            1 optional string version;         // 客户端版本号，如：5.8.0.2505
+            2 require long uin;                // 用户uin
+            3 require long seqno;              // 系列号(目前用毫秒的时间戳)，跟uin 组成唯一关键字，用来客户端重试和服务端去重
+            4 optional string sModule;         // 模块名称，各个模块自定义。如： qqwallet， qqwifi 等
+            5 optional string sAction;         // 操作名称，各个模块的对应操作名称。 如：pay
+            6 optional int iNetType;           // 网络类型, UNKNOWN=0, WIFI=1, 2G=2,  3G=3, 4G=4
+            7 optional int result;             // 结果，0:成功，非零:失败
+            8 optional string imei;             // imei号
+         	9 optional string guid;              // guid;
+    };
+     // 监控/状态 报告信息体
+    struct ReportBody
+    {
+      0 optional string sKey;                     // 关键字,所有步骤对应的关键字，如：钱包的tokenId 等
+      1 optional long startTime;                  // 状态报告开始时间
+      2 optional long totalTime;                  // 总共耗时(单位ms) 例如：从支付入口开始到返回给第三方的所有时间
+      3 optional vector<ReportItem> reportItems;  // 一个统计上报的每个关键步骤统计
+
+    };
+
+    // 监控/状态 报告信息
+    struct ReportInfo
+    {
+          0 require ReportHeader header;
+          1 optional ReportBody  body;
+    };
+
+    // 监控/状态上报请求
+    struct ReportReq
+    {
+      0 require vector<ReportInfo> reports;
+    };
+     // 监控/状态上报应答
+    struct ReportRsp
+    {
+      0 require vector<ReportHeader> headers;  // 后台返回uin,seqno和result，客户端根据这3个参数来确定是否上报成功
+    };
+};
